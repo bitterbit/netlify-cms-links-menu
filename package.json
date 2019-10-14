@@ -32,7 +32,10 @@
     "webpack-serve": "^0.3.1"
   },
   "dependencies": {
-    "prop-types": "^15.6.1"
+    "immutable": "^4.0.0-rc.12",
+    "prop-types": "^15.6.1",
+    "styled-components": "^1.4.6",
+    "react-select": "^2.4.2"
   },
   "peerDependencies": {
     "react": "^16"

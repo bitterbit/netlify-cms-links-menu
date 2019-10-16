@@ -1,1 +1,1 @@
-window.CMS_MANUAL_INIT = true
+// window.CMS_MANUAL_INIT = true

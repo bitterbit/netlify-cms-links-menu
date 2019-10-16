@@ -26,7 +26,12 @@ const developmentConfig = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      hash: true,
+      title: "My Awseome Demo",
+      cms_url: "/static/config.yml",
+      template: "./src/index.html"
+    }),
   ],
   devtool: 'eval-source-map',
 }

@@ -1,0 +1,41 @@
+backend:
+  name: test-repo
+  login: false
+
+media_folder: "static/assets/uploads/"
+public_folder: "assets/uploads"
+
+collections:
+  - name: test
+    label: Test
+    folder: test
+    slug: "{{slug}]"
+    create: true
+    fields: 
+      - { name: 'title', label: 'Title', widget: 'string'}
+      - { name: 'relation', label: 'Relation', widget: 'relation', collection: 'presentations', searchFields: ['title'], valueFields: ['title']}
+      - { name: 'test_widget', label: 'Test Widget', widget: 'test'}
+
+  - name: presentations
+    label: Presentation
+    folder: presentations
+    slug: "{{slug}}"
+    create: true
+    fields:
+      - {label: Title, name: title, widget: string, tagname: ""}
+
+      - label: Theme
+        name: theme
+        widget: select
+        options:
+          - beige
+          - black
+          - blood
+          - league
+          - moon
+          - night
+          - serif
+          - simple
+          - sky
+          - solarized
+          - white

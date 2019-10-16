@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import React from 'react';
 import {Container, GroupListItem, PlusListItem, LinkListItem} from './components.js';
 import { fromJS } from 'immutable';
 
 import AsyncSelect from 'react-select/lib/Async';
-
-console.log(AsyncSelect);
 
 const defaultLinks = [
 	{title: "One",   href: "#one"},
@@ -24,14 +23,17 @@ function renderLinkItem(item, index){
 export default class Control extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
-    forID: PropTypes.string,
+    forID: PropTypes.string.isRequired,
     value: PropTypes.node,
+    field: ImmutablePropTypes.map,
+    fetchID: PropTypes.string,
+    query: PropTypes.func.isRequired,
+    queryHits: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     classNameWrapper: PropTypes.string.isRequired,
-  }
+    setActiveStyle: PropTypes.func.isRequired,
+    setInactiveStyle: PropTypes.func.isRequired,
+  };
 
-  static defaultProps = {
-    value: '',
-  }
 
   getValue = () => {
     return this.props.value || fromJS(defaultLinks);
@@ -87,6 +89,7 @@ export default class Control extends React.Component {
 
   loadOptions = (inputValue, callback) => {
     console.log("load options", inputValue);
+    console.log("query?", this.props.query);
     callback([
       { value: "AAA", label: "aaa"},
       { value: "BBB", label: "bbb"},
@@ -105,8 +108,10 @@ export default class Control extends React.Component {
       value,
       onChange,
       classNameWrapper,
+      query,
     } = this.props;
 
+    console.log("onrender query", query, "ForID", forID);
     const linkItems = this.renderLinkItems();
 
     return (

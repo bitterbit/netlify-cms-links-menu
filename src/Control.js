@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import React from 'react';
-import {Container, GroupListItem, PlusListItem, LinkListItem} from './components.js';
+import { Container, GroupListItem, PlusListItem, LinkListItem } from './components.js';
 import { fromJS } from 'immutable';
 
 import AsyncSelect from 'react-select/lib/Async';
@@ -26,7 +26,6 @@ export default class Control extends React.Component {
     forID: PropTypes.string.isRequired,
     value: PropTypes.node,
     field: ImmutablePropTypes.map,
-    fetchID: PropTypes.string,
     query: PropTypes.func.isRequired,
     queryHits: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     classNameWrapper: PropTypes.string.isRequired,
@@ -88,13 +87,13 @@ export default class Control extends React.Component {
   }
 
   loadOptions = (inputValue, callback) => {
-    console.log("load options", inputValue);
-    console.log("query?", this.props.query);
-    callback([
-      { value: "AAA", label: "aaa"},
-      { value: "BBB", label: "bbb"},
-      { value: "CCC", label: "ccc"},
-    ]);
+    const { query, forID } = this.props;
+    query(forID, "presentations",  ["title"], inputValue).then(({payload}) => {
+      let results = payload.response.hits || [];
+      callback(results.map((item) => {
+        return {value: item.data.title, label: item.data.title};
+      }));
+    });
   };
 
   handleInputChange = (newValue) => {

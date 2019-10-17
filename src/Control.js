@@ -82,33 +82,12 @@ export default class Control extends React.Component {
     });
   }
 
-  handleAdd = (title) => {
+  addItem = (title, value) => {
     const listValue = this.getValue();
     const { onChange } = this.props;
-    const parsedValue = fromJS({title: title, href: "#new!"});
+    const parsedValue = fromJS({title: title, href: "#"+value});
     console.log(parsedValue);
     onChange((listValue || List()).push(parsedValue));
-  }
-
-  handleKeyUp = (e) => {
-    e.preventDefault();
-    if (e.which == 13) { // Enter
-      let content = e.target.textContent;
-      e.target.textContent = "";
-      this.handleAdd(content); 
-    }
-  }
-
-  handleFocus = (e) => {
-    if (e.target.textContent === "New Item") {
-      e.target.textContent = "";
-    }
-  }
-
-  handleUnFocus = (e) => {
-    if (e.target.textContent.length == 0) { 
-      e.target.textContent = "New Item";
-    }
   }
 
   loadOptions = (inputValue, callback) => {
@@ -121,9 +100,10 @@ export default class Control extends React.Component {
     });
   };
 
-  handleInputChange = (newValue) => {
-    console.log("input change", newValue);
-    return newValue;
+  handleSelectChange = (newValue, event) => {
+    if (event.action === 'select-option'){
+      this.addItem(newValue.label, newValue.value);
+    }
   };
 
   render() {
@@ -137,22 +117,15 @@ export default class Control extends React.Component {
 
     console.log("onrender query", query, "ForID", forID);
     const linkItems = this.renderLinkItems();
-    
+
     return (
       <Container>
         {linkItems}
-        <PlusListItem 
-          key="plus-list-item"
-          onKeyUp={this.handleKeyUp}
-          onFocus={this.handleFocus} 
-          onBlur={this.handleUnFocus}>
-          <div contenteditable="true">New Item</div>
-        </PlusListItem>
-
+    
         <PlusListItem>
           <AsyncSelect
+            onChange={this.handleSelectChange}
             loadOptions={this.loadOptions}
-            onInputChange={this.handleInputChange}
             styles={customStyles}
             theme={customTheme}
             placeholder={'New Item...'}

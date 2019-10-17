@@ -5,6 +5,7 @@ import { Container, GroupListItem, PlusListItem, LinkListItem } from './componen
 import { fromJS } from 'immutable';
 
 import AsyncSelect from 'react-select/lib/Async';
+import { reduce } from 'rxjs/operators';
 
 const defaultLinks = [
 	{title: "One",   href: "#one"},
@@ -19,6 +20,30 @@ function renderLinkItem(item, index){
   const key="render-item"+index + Math.random();
   return <LinkListItem key={key} value={item.get("href")}>{item.get("title")}</LinkListItem>;
 }
+
+/* React Async Select Styles */
+const customStyles = {
+  control: (base, state) => ({
+    ...base,
+    height: '32px',
+    minHeight: '32px',
+    border: 'none',
+    boxShadow: 'none',
+  }),
+  
+  valueContainer: (base, state) => ({
+      ...base,
+      padding: '0',
+  }),
+};
+
+const customTheme = theme => ({
+  ...theme,
+  colors: {
+    ...theme.colors,
+    primary: 'rgb(223, 223, 227)',
+  }
+});
 
 export default class Control extends React.Component {
   static propTypes = {
@@ -112,7 +137,7 @@ export default class Control extends React.Component {
 
     console.log("onrender query", query, "ForID", forID);
     const linkItems = this.renderLinkItems();
-
+    
     return (
       <Container>
         {linkItems}
@@ -123,10 +148,16 @@ export default class Control extends React.Component {
           onBlur={this.handleUnFocus}>
           <div contenteditable="true">New Item</div>
         </PlusListItem>
-        <AsyncSelect
-          loadOptions={this.loadOptions}
-          onInputChange={this.handleInputChange}
-        />
+
+        <PlusListItem>
+          <AsyncSelect
+            loadOptions={this.loadOptions}
+            onInputChange={this.handleInputChange}
+            styles={customStyles}
+            theme={customTheme}
+            placeholder={'New Item...'}
+          />
+        </PlusListItem>
         
       </Container>
     );

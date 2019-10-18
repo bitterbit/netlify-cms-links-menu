@@ -20,7 +20,8 @@ const defaultLinks = [
 	{title: "Two",   href: "#two"},
 	{title: "Three", href: "#three"},
 	{title: "Four",  children: [
-		{title: "Four point One", href: "#four.one"}
+    {title: "Four point One", href: "#four.one"},
+    {title: "Four point Two", href: "#four.two"}
 	]},
 ];
 
@@ -184,42 +185,50 @@ export default class Control extends React.Component {
     }
   };
 
-  handleMoveUp = (e, item) => {
+  moveRootItem = (item, up) => {
     const { onChange } = this.props;
-    let index = -1;
-    if (item.parent === ROOT_ID){
-      index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
-    } else {
-      console.log("Parent is not ROOT, TODO");
+    const size = this.getValue().size;
+    const index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
+    if (index <= 0 && up || index >= size && !up){
+      return; // nothing to do
     }
-
-    if (index <= 0) {
-      return; // nothing to do...
-    }
-
+    const offset = up ? -1 : 1;
     const listItem = this.getValue().get(index);
-    const newList = this.getValue().delete(index).insert(index-1, listItem);
+    const newList = this.getValue().delete(index).insert(index+offset, listItem);
     onChange(newList);
+  }
+
+  moveChildItem = (item, up) => {
+    const { onChange } = this.props;
+    let list = this.getValue();
+    const size = list.size;
+    const parentIndex = list.findIndex(x => item.parent == x.get(FIELD_TITLE));
+    let parent = list.get(parentIndex);
+    let children = parent.get(FIELD_CHILDREN);
+    let index = children.findIndex(x => item.title === x.get(FIELD_TITLE));
+    if (index <= 0 && up || index >= size && !up){
+      return; // nothing to do
+    }
+    const child = children.get(index);
+    const offset = up ? -1 : 1;
+    const newChildren = children.delete(index).insert(index+offset, child);
+    parent = parent.set(FIELD_CHILDREN, newChildren);
+    list = list.set(parentIndex, parent);
+    onChange(list);
+  }
+
+  handleMoveUp = (e, item) => {
+    if (item.parent === ROOT_ID){
+      return this.moveRootItem(item, true);
+    } 
+    this.moveChildItem(item, true);
   };
 
   handleMoveDown = (e, item) => {
-    const { onChange } = this.props;
-    const size = this.getValue().size;
-    let index = size;
-    
     if (item.parent === ROOT_ID){
-      index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
-    } else {
-      console.log("Parent is not ROOT, TODO");
+      return this.moveRootItem(item, false);
     }
-
-    if (index >= size) {
-      return; // nothing to do...
-    }
-
-    const listItem = this.getValue().get(index);
-    const newList = this.getValue().delete(index).insert(index+1, listItem);
-    onChange(newList);
+    this.moveChildItem(item, false);
   };
 
   render() {

@@ -4,6 +4,7 @@ import React from 'react';
 import { Container, GroupListItem, PlusListItem, LinkListItem } from './components.js';
 import { fromJS } from 'immutable';
 import AsyncSelect from 'react-select/lib/Async';
+import AsyncSelectCreatable from 'react-select/lib/AsyncCreatable';
 
 const ROOT_ID = 'root';
 
@@ -76,7 +77,7 @@ export default class Control extends React.Component {
     return value.map((item, index) => {
       let children = item.get(FIELD_CHILDREN);
       
-      if (children !== undefined && children.size > 0) {
+      if (children !== undefined && children.size >= 0) {
         const childrenItems = children.map((child, i) => {
           return renderLinkItem(child, i);
         });
@@ -95,6 +96,20 @@ export default class Control extends React.Component {
   }
 
   renderSelect = parent => {
+    
+    if (parent === ROOT_ID){
+      return <PlusListItem>
+        <AsyncSelectCreatable
+          onChange={this.handleSelectChangedFor(ROOT_ID)}
+          cacheOptions
+          defaultOptions
+          loadOptions={this.loadOptions}
+          styles={customStyles}
+          theme={customTheme}
+          placeholder={'New Item...'}
+        />
+      </PlusListItem>
+    }
     return <PlusListItem>
       <AsyncSelect
         onChange={this.handleSelectChangedFor(parent)}
@@ -109,8 +124,8 @@ export default class Control extends React.Component {
   };
 
   addItem = (parent, title, href) => {
-    let listValue = this.getValue() || List();
     const { onChange } = this.props;
+    let listValue = this.getValue() || List();
     const parsedValue = fromJS({title: title, href: href});
 
     if (parent != ROOT_ID){
@@ -129,12 +144,18 @@ export default class Control extends React.Component {
     onChange(listValue);
   }
 
+  addGroupItem = title => {
+    const { onChange } = this.props;
+    const listValue = this.getValue() || List();
+    const parsedValue = fromJS({title: title, children: []});
+    onChange(listValue.push(parsedValue));
+  };
+
   loadOptions = (inputValue, callback) => {
     const { query, forID } = this.props;
     query(forID, "presentations",  ["title"], inputValue).then(({payload}) => {
       let results = payload.response.hits || [];
       callback(results.map((item) => {
-        console.log("result", item);
         return {value: item.slug, label: item.data.title};
       }));
     });
@@ -147,7 +168,14 @@ export default class Control extends React.Component {
   handleSelectChange = (newValue, event, parent) => {
     if (event.action === 'select-option'){
       this.addItem(parent, newValue.label, newValue.value);
+      return;
     }
+
+    if (event.action === 'create-option'){
+      this.addGroupItem(newValue.value);
+      return;
+    }
+
   };
 
   render() {

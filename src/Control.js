@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import React from 'react';
-import { Container, GroupListItem, PlusListItem, LinkListItem } from './components.js';
+
 import { fromJS } from 'immutable';
 import AsyncSelect from 'react-select/lib/Async';
 import AsyncSelectCreatable from 'react-select/lib/AsyncCreatable';
+
+import { Container, GroupListItem, PlusListItem, LinkListItem, ArrowUp, UL } from './components.js';
+import LinkItem from './LinkItem.js'
 
 const ROOT_ID = 'root';
 
@@ -20,15 +23,6 @@ const defaultLinks = [
 		{title: "Four point One", href: "#four.one"}
 	]},
 ];
-
-function renderLinkItem(item, index){
-  const key="render-item"+index + Math.random();
-  return <LinkListItem 
-    key={key} 
-    value={item.get(FIELD_HREF)}>
-      {item.get(FIELD_TITLE)}
-  </LinkListItem>;
-}
 
 /* React Async Select Styles */
 const customStyles = {
@@ -78,20 +72,21 @@ export default class Control extends React.Component {
       let children = item.get(FIELD_CHILDREN);
       
       if (children !== undefined && children.size >= 0) {
+        const parent = item.get("title");
         const childrenItems = children.map((child, i) => {
-          return renderLinkItem(child, i);
+          return <LinkItem title={child.get(FIELD_TITLE)} href={child.get(FIELD_HREF)} key={parent+"-item-"+i}/>;
         });
 
         const addNewItem = this.renderSelect(item.get(FIELD_TITLE));
-        return <GroupListItem key={index}>{item.get(FIELD_TITLE)}
-            <ul>
+        return <GroupListItem key={parent+"-group-"+index}>{item.get(FIELD_TITLE)}
+            <UL key={parent+"-ul"+index}>
               {childrenItems}
               {addNewItem}
-            </ul>
+            </UL>
           </GroupListItem>;
       }
       
-      return renderLinkItem(item, index); 
+      return <LinkItem title={item.get(FIELD_TITLE)} href={item.get(FIELD_HREF)} key={"root-item-"+index}/>;
     });
   }
 

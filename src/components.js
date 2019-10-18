@@ -36,4 +36,27 @@ border-radius: 0px 5px 5px;
 padding: 10px;
 `;
 
-export {Container, GroupListItem, PlusListItem, LinkListItem};
+const UL = styled.ul`
+    margin: 0;
+`;
+
+const I = styled.i`
+border: solid #4e5c6e;
+border-width: 0 2px 2px 0;
+display: inline-block;
+padding: 3px;
+margin-left: 3px;
+margin-right: 3px;
+`;
+
+const ArrowUp = styled(I)`
+transform: rotate(-135deg);
+-webkit-transform: rotate(-135deg);
+`;
+
+const ArrowDown = styled(I)`
+transform: rotate(45deg);
+-webkit-transform: rotate(45deg);
+`;
+
+export {Container, GroupListItem, PlusListItem, LinkListItem, UL, ArrowUp, ArrowDown};

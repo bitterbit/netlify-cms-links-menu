@@ -45,8 +45,8 @@ border: solid #4e5c6e;
 border-width: 0 2px 2px 0;
 display: inline-block;
 padding: 3px;
-margin-left: 3px;
-margin-right: 3px;
+margin-left: 6px;
+margin-right: 6px;
 `;
 
 const ArrowUp = styled(I)`

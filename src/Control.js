@@ -108,10 +108,10 @@ export default class Control extends React.Component {
     </PlusListItem>;
   };
 
-  addItem = (parent, title, value) => {
+  addItem = (parent, title, href) => {
     let listValue = this.getValue() || List();
     const { onChange } = this.props;
-    const parsedValue = fromJS({title: title, href: "#"+value});
+    const parsedValue = fromJS({title: title, href: href});
 
     if (parent != ROOT_ID){
       listValue = listValue.update(
@@ -134,7 +134,8 @@ export default class Control extends React.Component {
     query(forID, "presentations",  ["title"], inputValue).then(({payload}) => {
       let results = payload.response.hits || [];
       callback(results.map((item) => {
-        return {value: item.data.title, label: item.data.title};
+        console.log("result", item);
+        return {value: item.slug, label: item.data.title};
       }));
     });
   };

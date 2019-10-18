@@ -3,9 +3,13 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import React from 'react';
 import { Container, GroupListItem, PlusListItem, LinkListItem } from './components.js';
 import { fromJS } from 'immutable';
-
 import AsyncSelect from 'react-select/lib/Async';
-import { reduce } from 'rxjs/operators';
+
+const ROOT_ID = 'root';
+
+const FIELD_TITLE = 'title';
+const FIELD_CHILDREN = 'children';
+const FIELD_HREF = 'href';
 
 const defaultLinks = [
 	{title: "One",   href: "#one"},
@@ -18,7 +22,11 @@ const defaultLinks = [
 
 function renderLinkItem(item, index){
   const key="render-item"+index + Math.random();
-  return <LinkListItem key={key} value={item.get("href")}>{item.get("title")}</LinkListItem>;
+  return <LinkListItem 
+    key={key} 
+    value={item.get(FIELD_HREF)}>
+      {item.get(FIELD_TITLE)}
+  </LinkListItem>;
 }
 
 /* React Async Select Styles */
@@ -66,15 +74,19 @@ export default class Control extends React.Component {
   renderLinkItems = () => {
     const value = this.getValue();
     return value.map((item, index) => {
-      let children = item.get("children");
+      let children = item.get(FIELD_CHILDREN);
       
       if (children !== undefined && children.size > 0) {
         const childrenItems = children.map((child, i) => {
           return renderLinkItem(child, i);
         });
 
-        return <GroupListItem key={index}>{item.get("title")}
-            <ul>{childrenItems}</ul>
+        const addNewItem = this.renderSelect(item.get(FIELD_TITLE));
+        return <GroupListItem key={index}>{item.get(FIELD_TITLE)}
+            <ul>
+              {childrenItems}
+              {addNewItem}
+            </ul>
           </GroupListItem>;
       }
       
@@ -82,12 +94,39 @@ export default class Control extends React.Component {
     });
   }
 
-  addItem = (title, value) => {
-    const listValue = this.getValue();
+  renderSelect = parent => {
+    return <PlusListItem>
+      <AsyncSelect
+        onChange={this.handleSelectChangedFor(parent)}
+        cacheOptions
+        defaultOptions
+        loadOptions={this.loadOptions}
+        styles={customStyles}
+        theme={customTheme}
+        placeholder={'New Item...'}
+      />
+    </PlusListItem>;
+  };
+
+  addItem = (parent, title, value) => {
+    let listValue = this.getValue() || List();
     const { onChange } = this.props;
     const parsedValue = fromJS({title: title, href: "#"+value});
-    console.log(parsedValue);
-    onChange((listValue || List()).push(parsedValue));
+
+    if (parent != ROOT_ID){
+      listValue = listValue.update(
+        listValue.findIndex(item => item.get(FIELD_TITLE) === parent), 
+        item => {
+          const newchildren = item.get(FIELD_CHILDREN).push(parsedValue);
+          return item.set(FIELD_CHILDREN, newchildren);
+        }
+      );
+    } else {
+      // Add to root
+      listValue = listValue.push(parsedValue);
+    }
+    
+    onChange(listValue);
   }
 
   loadOptions = (inputValue, callback) => {
@@ -100,38 +139,23 @@ export default class Control extends React.Component {
     });
   };
 
-  handleSelectChange = (newValue, event) => {
+  handleSelectChangedFor = parent => {
+    return (newValue, event) => this.handleSelectChange(newValue, event, parent);
+  }
+
+  handleSelectChange = (newValue, event, parent) => {
     if (event.action === 'select-option'){
-      this.addItem(newValue.label, newValue.value);
+      this.addItem(parent, newValue.label, newValue.value);
     }
   };
 
   render() {
-    const {
-      forID,
-      value,
-      onChange,
-      classNameWrapper,
-      query,
-    } = this.props;
-
-    console.log("onrender query", query, "ForID", forID);
     const linkItems = this.renderLinkItems();
-
+    const addNewItem = this.renderSelect(ROOT_ID);
     return (
       <Container>
         {linkItems}
-    
-        <PlusListItem>
-          <AsyncSelect
-            onChange={this.handleSelectChange}
-            loadOptions={this.loadOptions}
-            styles={customStyles}
-            theme={customTheme}
-            placeholder={'New Item...'}
-          />
-        </PlusListItem>
-        
+        {addNewItem}
       </Container>
     );
   }

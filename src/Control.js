@@ -74,7 +74,13 @@ export default class Control extends React.Component {
       if (children !== undefined && children.size >= 0) {
         const parent = item.get("title");
         const childrenItems = children.map((child, i) => {
-          return <LinkItem title={child.get(FIELD_TITLE)} href={child.get(FIELD_HREF)} key={parent+"-item-"+i}/>;
+          return <LinkItem 
+            title={child.get(FIELD_TITLE)} 
+            href={child.get(FIELD_HREF)} 
+            parent={parent}
+            onClickUp={this.handleMoveUp}
+            onClickDown={this.handleMoveDown}
+            key={parent+"-item-"+i}/>;
         });
 
         const addNewItem = this.renderSelect(item.get(FIELD_TITLE));
@@ -86,7 +92,13 @@ export default class Control extends React.Component {
           </GroupListItem>;
       }
       
-      return <LinkItem title={item.get(FIELD_TITLE)} href={item.get(FIELD_HREF)} key={"root-item-"+index}/>;
+      return <LinkItem 
+        title={item.get(FIELD_TITLE)} 
+        href={item.get(FIELD_HREF)}
+        parent={ROOT_ID}
+        onClickUp={this.handleMoveUp}
+        onClickDown={this.handleMoveDown}
+        key={"root-item-"+index}/>;
     });
   }
 
@@ -170,7 +182,44 @@ export default class Control extends React.Component {
       this.addGroupItem(newValue.value);
       return;
     }
+  };
 
+  handleMoveUp = (e, item) => {
+    const { onChange } = this.props;
+    let index = -1;
+    if (item.parent === ROOT_ID){
+      index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
+    } else {
+      console.log("Parent is not ROOT, TODO");
+    }
+
+    if (index <= 0) {
+      return; // nothing to do...
+    }
+
+    const listItem = this.getValue().get(index);
+    const newList = this.getValue().delete(index).insert(index-1, listItem);
+    onChange(newList);
+  };
+
+  handleMoveDown = (e, item) => {
+    const { onChange } = this.props;
+    const size = this.getValue().size;
+    let index = size;
+    
+    if (item.parent === ROOT_ID){
+      index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
+    } else {
+      console.log("Parent is not ROOT, TODO");
+    }
+
+    if (index >= size) {
+      return; // nothing to do...
+    }
+
+    const listItem = this.getValue().get(index);
+    const newList = this.getValue().delete(index).insert(index+1, listItem);
+    onChange(newList);
   };
 
   render() {

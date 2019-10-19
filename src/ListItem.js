@@ -1,5 +1,7 @@
 import React from 'react';
-import { LinkListItem, GroupListItem, ArrowUp, ArrowDown } from './components.js';
+import styled from "styled-components";
+import { Trash, ArrowUp, ArrowDown } from 'react-feather';
+import { LinkListItem, GroupListItem } from './components.  js';
 
 export default class ListItem extends React.Component {
     state = { hover: false };
@@ -40,17 +42,24 @@ export default class ListItem extends React.Component {
 
     render() {
         const {title, href}  = this.props;
-        const arrowUp   = this.state.hover ? <ArrowUp onClick={this.onClickUp} /> : "";
-        const arrowDown = this.state.hover ? <ArrowDown onClick={this.onClickDown} /> : "";
-        const deleteBtn = this.state.hover ? <i onClick={this.onClickDelete}>delete</i>: "";
+
+        const AlignedSpan = styled.span`
+            vertical-align: middle;
+            display: inline-block;
+        `;
+
+        const color="#4e5c6e";
+        const arrowUp   = this.state.hover ? <AlignedSpan><ArrowUp size='18' color={color} onClick={this.onClickUp} /></AlignedSpan> : "";
+        const arrowDown = this.state.hover ? <AlignedSpan><ArrowDown size='18' color={color} onClick={this.onClickDown} /></AlignedSpan> : "";
+        const deleteBtn = this.state.hover ? <AlignedSpan><Trash size='17' color={color} onClick={this.onClickDelete} /></AlignedSpan> : "";
 
         if (this.props.mode !== undefined && this.props.mode === 'group'){
             return <GroupListItem>
                     <span onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
-                    {deleteBtn}
-                    {arrowUp}
-                    {arrowDown}
-                    {title}
+                        {deleteBtn}
+                        {arrowDown}
+                        {arrowUp}
+                        <AlignedSpan>{title}</AlignedSpan>
                     </span>
                     {this.props.children}
                 </GroupListItem>;
@@ -61,10 +70,12 @@ export default class ListItem extends React.Component {
                 value={href}
                 onMouseEnter={this.onMouseEnter}
                 onMouseLeave={this.onMouseLeave}>
-                    {deleteBtn}
-                    {arrowUp}
-                    {arrowDown}
-                    {title}
+                    <span>
+                        {deleteBtn}
+                        {arrowDown}
+                        {arrowUp}
+                        <AlignedSpan>{title}</AlignedSpan>
+                    </span>
         </LinkListItem>;
     }
 }

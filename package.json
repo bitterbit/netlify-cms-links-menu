@@ -36,6 +36,7 @@
     "netlify-cms": "^2.4.0",
     "prop-types": "^15.6.1",
     "react-dom": "^16.10.2",
+    "react-feather": "^2.0.3",
     "react-immutable-proptypes": "^2.1.0",
     "react-select": "^2.4.2",
     "styled-components": "^1.4.6"

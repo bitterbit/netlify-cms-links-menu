@@ -6,7 +6,7 @@ import { fromJS } from 'immutable';
 import AsyncSelect from 'react-select/lib/Async';
 import AsyncSelectCreatable from 'react-select/lib/AsyncCreatable';
 
-import { Container, GroupListItem, PlusListItem, LinkListItem, ArrowUp, UL } from './components.js';
+import { Container, PlusListItem, UL } from './components.js';
 import ListItem from './ListItem.js'
 
 const ROOT_ID = 'root';
@@ -171,12 +171,19 @@ export default class Control extends React.Component {
   };
 
   loadOptions = (inputValue, callback) => {
-    const { query, forID } = this.props;
-    query(forID, "presentations",  ["title"], inputValue).then(({payload}) => {
-      let results = payload.response.hits || [];
-      callback(results.map((item) => {
+    const { query, forID, field } = this.props;
+    const collections = field.get("collections") || new Array();
+
+    // query all given collections
+    Promise.all(collections.map(collection => {
+      return query(forID, collection, ["title"], inputValue);
+    })).then(values => {
+      let results = values.map(x => x.payload.response.hits);
+      results = results.flat(1);
+      results = results.map(item => {
         return {value: item.slug, label: item.data.title};
-      }));
+      });
+      callback(results);
     });
   };
 

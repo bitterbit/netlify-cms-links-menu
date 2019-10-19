@@ -13,7 +13,15 @@ collections:
     create: true
     fields: 
       - { name: 'title', label: 'Title', widget: 'string'}
-      - { name: 'test_widget', label: 'Test Widget', widget: 'test'}
+      - { name: 'test_widget', label: 'Test Widget', widget: 'test', collections: ['presentations', 'other']}
+
+  - name: other
+    label: Other
+    folder: other
+    slug: "{{slug}}"
+    create: true
+    fields: 
+      - {label: Title, name: title, widget: string, tagname: ""}
 
   - name: presentations
     label: Presentation

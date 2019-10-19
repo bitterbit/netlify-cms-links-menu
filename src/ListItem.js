@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 import { Trash, ArrowUp, ArrowDown } from 'react-feather';
-import { LinkListItem, GroupListItem } from './components.  js';
+import { LinkListItem, GroupListItem } from './components.js';
 
 export default class ListItem extends React.Component {
     state = { hover: false };

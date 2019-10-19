@@ -12,6 +12,12 @@ export default class ListItem extends React.Component {
         this.setState({hover: false});
     }
 
+    onClickDelete = e => {
+        if (this.props.onDelete !== undefined){
+            this.props.onDelete(e, this.getData());
+        }
+    }
+
     onClickUp = e => {
         if (this.props.onClickUp !== undefined){
             this.props.onClickUp(e, this.getData());
@@ -36,10 +42,12 @@ export default class ListItem extends React.Component {
         const {title, href}  = this.props;
         const arrowUp   = this.state.hover ? <ArrowUp onClick={this.onClickUp} /> : "";
         const arrowDown = this.state.hover ? <ArrowDown onClick={this.onClickDown} /> : "";
+        const deleteBtn = this.state.hover ? <i onClick={this.onClickDelete}>delete</i>: "";
 
         if (this.props.mode !== undefined && this.props.mode === 'group'){
             return <GroupListItem>
                     <span onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
+                    {deleteBtn}
                     {arrowUp}
                     {arrowDown}
                     {title}
@@ -53,6 +61,7 @@ export default class ListItem extends React.Component {
                 value={href}
                 onMouseEnter={this.onMouseEnter}
                 onMouseLeave={this.onMouseLeave}>
+                    {deleteBtn}
                     {arrowUp}
                     {arrowDown}
                     {title}

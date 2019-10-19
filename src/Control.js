@@ -80,6 +80,7 @@ export default class Control extends React.Component {
             title={child.get(FIELD_TITLE)} 
             href={child.get(FIELD_HREF)} 
             parent={parent}
+            onDelete={this.handleDelete}
             onClickUp={this.handleMoveUp}
             onClickDown={this.handleMoveDown}
             key={parent+"-item-"+i}/>;
@@ -88,6 +89,7 @@ export default class Control extends React.Component {
         const addNewItem = this.renderSelect(item.get(FIELD_TITLE));
         return <ListItem mode="group" parent={ROOT_ID} 
                 title={item.get(FIELD_TITLE)}
+                onDelete={this.handleDelete}
                 onClickUp={this.handleMoveUp}
                 onClickDown={this.handleMoveDown}
                 key={parent+"-group-"+index}>
@@ -105,6 +107,7 @@ export default class Control extends React.Component {
         title={item.get(FIELD_TITLE)} 
         href={item.get(FIELD_HREF)}
         parent={ROOT_ID}
+        onDelete={this.handleDelete}
         onClickUp={this.handleMoveUp}
         onClickDown={this.handleMoveDown}
         key={"root-item-"+index}/>;
@@ -191,6 +194,34 @@ export default class Control extends React.Component {
       this.addGroupItem(newValue.value);
       return;
     }
+  };
+
+  handleDelete = (e, item) => {
+    if (item.parent == ROOT_ID){
+      return this.deleteRootItem(item);
+    }
+    return this.deleteChildItem(item);
+  }
+
+  deleteRootItem = (item) => {
+    const { onChange } = this.props;
+    const index = this.getValue().findIndex(x => item.title === x.get(FIELD_TITLE));
+    onChange(
+      this.getValue().delete(index)
+    );
+  };
+
+  deleteChildItem = (item) => {
+    const { onChange } = this.props;
+    let list = this.getValue();
+    const parentIndex = list.findIndex(x => item.parent == x.get(FIELD_TITLE));
+    let parent = list.get(parentIndex);
+    let children = parent.get(FIELD_CHILDREN);
+    let index = children.findIndex(x => item.title === x.get(FIELD_TITLE));
+    children = children.delete(index);
+    parent = parent.set(FIELD_CHILDREN, children);
+    list = list.set(parentIndex, parent);
+    onChange(list);
   };
 
   moveRootItem = (item, up) => {

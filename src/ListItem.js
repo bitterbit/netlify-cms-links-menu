@@ -1,7 +1,7 @@
 import React from 'react';
-import { LinkListItem, ArrowUp, ArrowDown } from './components.js';
+import { LinkListItem, GroupListItem, ArrowUp, ArrowDown } from './components.js';
 
-export default class LinkItem extends React.Component {
+export default class ListItem extends React.Component {
     state = { hover: false };
 
     onMouseEnter = e => {
@@ -28,7 +28,7 @@ export default class LinkItem extends React.Component {
         return {
             title: this.props.title, 
             href: this.props.href, 
-            parent: this.props.parent
+            parent: this.props.parent,
         }
     }
 
@@ -37,6 +37,18 @@ export default class LinkItem extends React.Component {
         const arrowUp   = this.state.hover ? <ArrowUp onClick={this.onClickUp} /> : "";
         const arrowDown = this.state.hover ? <ArrowDown onClick={this.onClickDown} /> : "";
 
+        if (this.props.mode !== undefined && this.props.mode === 'group'){
+            return <GroupListItem>
+                    <span onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
+                    {arrowUp}
+                    {arrowDown}
+                    {title}
+                    </span>
+                    {this.props.children}
+                </GroupListItem>;
+        }
+
+        // mode: link (default)
         return <LinkListItem 
                 value={href}
                 onMouseEnter={this.onMouseEnter}

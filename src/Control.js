@@ -7,7 +7,7 @@ import AsyncSelect from 'react-select/lib/Async';
 import AsyncSelectCreatable from 'react-select/lib/AsyncCreatable';
 
 import { Container, GroupListItem, PlusListItem, LinkListItem, ArrowUp, UL } from './components.js';
-import LinkItem from './LinkItem.js'
+import ListItem from './ListItem.js'
 
 const ROOT_ID = 'root';
 
@@ -75,7 +75,8 @@ export default class Control extends React.Component {
       if (children !== undefined && children.size >= 0) {
         const parent = item.get("title");
         const childrenItems = children.map((child, i) => {
-          return <LinkItem 
+          return <ListItem 
+            mode="link"
             title={child.get(FIELD_TITLE)} 
             href={child.get(FIELD_HREF)} 
             parent={parent}
@@ -85,15 +86,22 @@ export default class Control extends React.Component {
         });
 
         const addNewItem = this.renderSelect(item.get(FIELD_TITLE));
-        return <GroupListItem key={parent+"-group-"+index}>{item.get(FIELD_TITLE)}
+        return <ListItem mode="group" parent={ROOT_ID} 
+                title={item.get(FIELD_TITLE)}
+                onClickUp={this.handleMoveUp}
+                onClickDown={this.handleMoveDown}
+                key={parent+"-group-"+index}>
+                
+                
             <UL key={parent+"-ul"+index}>
               {childrenItems}
               {addNewItem}
             </UL>
-          </GroupListItem>;
+          </ListItem>;
       }
       
-      return <LinkItem 
+      return <ListItem 
+        mode="link"
         title={item.get(FIELD_TITLE)} 
         href={item.get(FIELD_HREF)}
         parent={ROOT_ID}
